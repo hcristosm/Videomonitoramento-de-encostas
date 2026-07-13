@@ -1,0 +1,21 @@
+RELATÓRIO TÉCNICO DE PROCESSAMENTO TEMPORAL - DATASET NOTURNO
+Origem do Arquivo de Vídeo: MHDX_ch2_main_20250321000000_20250321003000.mp4
+=================================================================
+ CONFIGURAÇÕES DE ENTRADA DO PIPELINE:
+  • Gaussian Blur: (9, 9) | Canny thresholds: L:50 H:150
+  • Morph Close Kernel: Elipse (3, 3)
+  • Área do Alvo: 20 a 5000 px | Circularidade Mínima: > 0.5
+  • Raio Máximo de Busca (Associação Temporal): 4 px
+=================================================================
+ MATRIZ DE CONFUSÃO HISTÓRICA ACUMULADA:
+  • Total de Quadros Analisados:          54011
+  • Amostras Totais Avaliadas:             594121
+  • [TP] Verdadeiros Positivos Globais:   0
+  • [FP] Falsos Positivos Globais:        277489
+  • [FN] Falsos Negativos Globais:        594121
+=================================================================
+ ÍNDICES DE EFICIÊNCIA DO PROCESSAMENTO DE PONTA A PONTA:
+  • CONFIABILIDADE (Precisão):           0.00%
+  • PORCENTAGEM EXTRAÍDA (Recall):       0.00%
+  • ÍNDICE GLOBAL DE DESEMPENHO (F1):    0.00%
+=================================================================
