@@ -1,1 +1,18 @@
+# Manipulação de Dados e Plotagem
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
 
+# Processamento de Imagem e Visão Computacional
+opencv-python>=4.8.0
+
+# Inteligência Artificial (SAM 2 e PyTorch)
+ultralytics>=8.1.0
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Algoritmos Estatísticos (DBSCAN)
+scikit-learn>=1.3.0
+
+# Ambiente de Execução
+jupyterlab>=4.0.0
