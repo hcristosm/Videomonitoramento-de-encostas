@@ -19,6 +19,7 @@ Videomonitoramento-de-encostas/
 │   ├── pipeline_sam2.ipynb         # Segmentação com SAM 2
 │   └── validação_sam2.ipynb        # Scripts de auditoria e métricas (DBSCAN)
 └── requirements.txt                # Dependências do projeto
+```
 
 ---
 
@@ -58,6 +59,7 @@ git clone [https://github.com/hcristosm/Videomonitoramento-de-encostas.git](http
 cd Videomonitoramento-de-encostas
 pip install -r requirements.txt
 jupyter lab
+```
 
 2. Execução no Google Colab
 
