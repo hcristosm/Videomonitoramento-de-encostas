@@ -1,74 +1,83 @@
-💾 Acesso ao Dataset Experimental (Vídeos Brutos)
+# Videomonitoramento de Encostas - IG-UNICAMP
 
-Devido às restrições físicas de volumetria de armazenamento do GitHub, o banco de dados visual bruto — que totaliza 100 Gigabytes distribuídos em 889 arquivos de vídeo individuais (resolução HD 720p, 30 fps, compressão H.265+, container .mp4) — encontra-se salvaguardado localmente no HDD de backup da universidade.
+Este repositório armazena os códigos e dados da dissertação de mestrado de **Mateus Hcristos Leptokarydis** (Instituto de Geociências - UNICAMP).
 
-Para fins de reprodutibilidade científica e transparência metodológica, as 19 amostras em formato de vídeo correspondentes aos recortes temporais exatos submetidos à análise direta e auditoria cruzada deste trabalho encontram-se hospedadas permanentemente no armazenamento em nuvem.
+O objetivo do trabalho é avaliar a viabilidade técnica de um sistema de videomonitoramento de baixo custo com foco em **detectar a deflagração de movimentos** em encostas vegetadas.
+---
 
-🔗 Acesse aqui a pasta do Google Drive com as 19 Amostras em Vídeo Bruto
-⚙️ Resumo Técnico das Abordagens Computacionais
-1. Rotina Clássica (OpenCV)
+## 📁 Estrutura do Repositório
 
-Desenvolvida para operar de forma leve diretamente sobre Unidades Centrais de Processamento (CPUs) convencionais. O fluxo executa sequencialmente a 30 fps dentro de notebooks/pipeline_opencv.ipynb seguindo as etapas:
+```text
+Videomonitoramento-de-encostas/
+├── data/
+│   ├── processed/
+│   │   ├── Resultados_Diurno/      # Séries temporais e validações (06/03/2025)
+│   │   └── Resultados_Noturno/     # Séries temporais e validações (21/03/2025)
+│   └── reference/                  # Gabaritos e ROIs de calibração
+├── notebooks/                      # Códigos de execução interativa (.ipynb)
+│   ├── pipeline_opencv.ipynb       # Rastreamento em OpenCV
+│   ├── pipeline_sam2.ipynb         # Segmentação com SAM 2
+│   └── validação_sam2.ipynb        # Scripts de auditoria e métricas (DBSCAN)
+└── requirements.txt                # Dependências do projeto
 
-    Pré-processamento: Delimitação por Regiões de Interesse (ROI), conversão para matrizes em escala de cinza e aplicação de Filtro Gaussiano (9x9 pixels, sigma=0).
+---
 
-    Segmentação Estrutural: Extração de descontinuidades locais por Detector de Bordas de Canny (limiares de histerese 50/150) e fechamento morfológico via elemento estruturante elíptico (3x3 pixels).
+## 💾 Acesso aos Vídeos Brutos
 
-    Filtragem Geométrica: Varredura topológica de contornos com base em restrição multidimensional de área (janela útil entre 20 e 5000 pixels quadrados) e cálculo do Limiar de Circularidade Geométrica (C) por meio da relação:
-    C = (4 * pi * Area) / (Perímetro^2)
-    Exige-se C > 0,50 para validação das projeções esféricas dos alvos artificiais (bolas de tênis de mesa de 40 mm).
+O banco de dados completo do projeto possui 100 GB (889 vídeos) e está salvo fisicamente no laboratório da UNICAMP. 
 
-    Rastreamento e Blindagem Cinemática: Associação temporal por menor distância Euclidiana em relação ao gabarito estável. Implementou-se uma trava espacial limite de busca parametrizada em 4 pixels. Em cenários de oclusão, o algoritmo retém a última coordenada válida conhecida na planilha, impedindo o fenômeno de troca de identidade (ID Switch).
+Para garantir a reprodutibilidade dos testes, as **19 amostras em vídeo** utilizadas na análise direta do trabalho estão disponíveis em nuvem:
 
-2. Validação via Inteligência Artificial (SAM 2)
+🔗 **[Pasta de Vídeos no Google Drive](https://drive.google.com/drive/folders/1BJNxu7ApHlJl_VXuK1K5d1zV_L8b549b?usp=drive_link)**
 
-Implementada como um validador cruzado independente operando em modo zero-shot (sem ajuste fino) assistido por hardware gráfico (GPUs/CUDA) dentro de notebooks/pipeline_sam2.ipynb e notebooks/validação_sam2.ipynb:
+---
 
-    Utiliza o modelo de fundação baseado em transformadores de visão sam2.1_b.pt via biblioteca Ultralytics.
+## ⚙️ Abordagens Computacionais
 
-    Amostragem temporal discreta em intervalos regulares de Delta t = 30 segundos.
+### 1. Pipeline em OpenCV
+Algoritmo leve desenvolvido para rodar quadro a quadro em CPU convencional:
+* **Pré-processamento e Segmentação:** Recorte de Região de Interesse (ROI), escala de cinza, Filtro Gaussiano, detector de bordas de Canny e fechamento morfológico.
+* **Filtragem Geométrica:** Seleção de contornos por restrição de área e cálculo do limiar de circularidade ($C > 0,50$) para identificar os alvos (bolas de 40 mm).
+* **Rastreamento:** Associação temporal por menor distância Euclidiana com trava espacial limite de busca de **4 pixels** para evitar perda de rastreio (*ID Switch*) em oclusões.
 
-    Aplicação do algoritmo de agrupamento espacial baseado em densidade DBSCAN (epsilon = 4 pixels, persistência mínima de 5 quadros) para estruturar a identificação de marcadores legítimos na cena a partir das máscaras profundas binárias segmentadas.
+### 2. Validação via SAM 2
+Validação cruzada independente com aprendizado profundo operando em modo *zero-shot* (sem treino adicional):
+* **Segmentação:** Uso do modelo baseado em transformadores de visão `sam2.1_b.pt` (Ultralytics) com amostragem temporal a cada 30 segundos.
+* **Agrupamento:** Aplicação do algoritmo **DBSCAN** ($\epsilon = 4$ pixels) nas máscaras geradas pelo SAM 2 para validar espacialmente as detecções dos alvos legítimos.
 
-🚀 Instruções de Execução
-Instalação Local
+---
 
-Certifique-se de possuir o Python 3.10+ instalado no seu ambiente local.
+## 🚀 Como Executar
 
-    Clonar o Repositório:
-    Bash
+### 1. Instalação Local
+Requisitos: Python 3.10 ou superior.
 
-    git clone [https://github.com/hcristosm/Videomonitoramento-de-encostas.git](https://github.com/hcristosm/Videomonitoramento-de-encostas.git)
-    cd Videomonitoramento-de-encostas
+No terminal, execute:
+```bash
+git clone [https://github.com/hcristosm/Videomonitoramento-de-encostas.git](https://github.com/hcristosm/Videomonitoramento-de-encostas.git)
+cd Videomonitoramento-de-encostas
+pip install -r requirements.txt
+jupyter lab
 
-    Instalar as Dependências:
-    Bash
+2. Execução no Google Colab
 
-    pip install -r requirements.txt
+Os notebooks da pasta notebooks/ podem ser importados e executados diretamente no Google Colab, aproveitando a GPU em nuvem para acelerar o processamento do SAM 2.
 
-    Execução dos Notebooks:
-    Inicie o ambiente do Jupyter Lab ou Jupyter Notebook para abrir e executar as células dos códigos experimentais:
-    Bash
+---
 
-    jupyter lab
+## 📊 Redução de Dados para IoT
 
-Execução via Google Colab
+O processamento na borda elimina a necessidade de transmitir fluxos densos de vídeo (113 MB por arquivo de 30 minutos) por conexões móveis instáveis. 
 
-Caso prefira processar o modelo profundo (SAM 2) utilizando aceleração por hardware via GPU dedicada em nuvem, faça o upload dos arquivos contidos na pasta notebooks/ diretamente para o ambiente do Google Colab, certificando-se de montar o drive para acesso às planilhas e aos vídeos correspondentes.
-📊 Redução de Dimensionalidade e IoT
+O sistema reduz a dimensionalidade das imagens gerando tabelas compactas `.csv` com as coordenadas X e Y dos alvos (cerca de 20 MB por sensor), facilitando o envio de dados e a geração de alertas em tempo real.
 
-O pipeline foi projetado sob os preceitos de Internet das Coisas (IoT) aplicada à gestão de riscos de desastres naturais. Em vez de transmitir fluxos densos e pesados de vídeo por redes de baixa taxa de transmissão comuns em taludes escarpados, o script reduz a dimensionalidade das matrizes de pixels brutas na borda do sistema, gerando arquivos tabulares .csv textuais altamente compactados:
+---
 
-    Arquivo de Vídeo Bruto (30 min - HD): ~113 Megabytes
+## 📜 Licença e Citação
 
-    Planilha de Telemetria Cinemática (.csv): ~20 Megabytes por sensor
+Este projeto está sob a licença MIT. Para citar este trabalho em pesquisas acadêmicas:
 
-Essa otimização viabiliza o escoamento contínuo e em tempo real da telemetria para centrais remotas de monitoramento (Defesas Civis municipais, IPT e CEMADEN), contornando restrições logísticas de conectividade e largura de banda.
-📜 Licença e Citação
-
-Este repositório está sob a licença MIT. Caso utilize os algoritmos ou o conjunto de dados em pesquisas acadêmicas, cite a obra original:
-Snippet de código
-
+```bibtex
 @mastersthesis{leptokarydis2026viabilidade,
   author    = {Leptokarydis, Mateus Hcristos},
   title     = {Viabilidade Técnica de Videomonitoramento de Baixo Custo para Detecção de Instabilidades em Encostas da Serra do Mar},
@@ -76,5 +85,4 @@ Snippet de código
   year      = {2026},
   address   = {Campinas, SP},
   type      = {Dissertação (Mestrado em Geociências)}
-}
 }
